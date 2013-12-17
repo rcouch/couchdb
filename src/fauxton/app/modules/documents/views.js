@@ -969,6 +969,68 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
     }
   });
 
+  Views.AdvancedOptionsMenu = FauxtonAPI.View.extend({
+    template: 'templates/documents/advanced_options_menu',
+    events: {
+      "click input": "updateRows",
+      'change #group-level': 'updateRows',
+      'click #query-nav': 'toggleMenu'
+    },
+
+    initialize: function (options) {
+      this.hasReduce = options.hasReduce;
+      this.eventer = options.eventer;
+    },
+
+    toggleMenu: function (event) {
+      this.$('.checkbox').toggle();
+    },
+
+    updateRows: function (event) {
+      console.log('boom', event);
+      var $groupLevel = this.$('#group-level-label'),
+          params = {
+            include_docs: false,
+            reduce: false,
+            group_level: 0
+          };
+
+      if (this.$('#include-docs').prop('checked')) {
+        params.include_docs = true;
+      }
+
+      if (this.hasReduce && this.$('#reduce').prop('checked')) {
+        params.reduce = true;
+        params.group_level = this.$('#group-level option:selected').val();
+        $groupLevel.show();
+      } else {
+        $groupLevel.hide();
+      }
+
+      console.log(params);
+      this.eventer.trigger('options:param_update', params);
+    },
+
+    updateFromParams: function (params) {
+      if (params.reduce) {
+        var $reduce = this.$('#reduce');
+        $reduce.prop("checked", true);
+        this.$('#group-level').show();
+
+      } else if (params.include_docs) {
+        var $include_docs = this.$('#include-docs');
+        $include_docs.prop("checked", true);
+      }
+    },
+
+    serialize: function () {
+      return {
+        hasReduce: this.hasReduce
+      };
+    }
+
+  });
+
   Views.AdvancedOptions = FauxtonAPI.View.extend({
     template: "templates/documents/advanced_options",
     className: "advanced-options well",
@@ -979,7 +1041,7 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
       this.viewName = options.viewName;
       this.updateViewFn = options.updateViewFn;
       this.previewFn = options.previewFn;
-      //this.hadReduce = options.hasReduce || true;
+      this.eventer = options.eventer;
 
       if (typeof(options.hasReduce) === 'undefined') {
         this.hasReduce = true;
@@ -992,6 +1054,8 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
       } else {
         this.showPreview = options.showPreview;
       }
+
+      this.listenTo(this.eventer, 'options:param_update', this.optionsParamsUpdate);
     },
 
     events: {
@@ -1009,6 +1073,21 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
           view.update(this.database, this.ddocName, this.viewName);
         }, this);
       }
+    },
+
+    optionsParamsUpdate: function (params) {
+       var $form = this.$el.find("form.view-query-update");
+
+       if (params.reduce && params.group_level) {
+        $form.find("select[name='group_level']").val(params.group_level).removeAttr('disabled');
+        delete params.group_level;
+       } else {
+        $form.find("select[name='group_level']").attr('disabled');
+       }
+      _.each(params, function(val, key) {
+        $form.find("input[name='"+key+"']").prop('checked', val);
+      });
+      this.$('form.view-query-update').submit();
     },
 
     renderOnUpdatehasReduce: function (hasReduce) {
@@ -1082,7 +1161,7 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
         var $ele;
         switch (key) {
           case "limit":
-            case "group_level":
+           case "group_level":
             $form.find("select[name='"+key+"']").val(val);
           break;
           case "include_docs":
@@ -1187,7 +1266,8 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
       "click button.delete": "deleteView",
       "change select#reduce-function-selector": "updateReduce",
       "click button.preview": "previewView",
-      "click #db-views-tabs-nav": 'toggleIndexNav'
+      "click #db-views-tabs-nav": 'toggleIndexNav',
+      "click #query-options-wrapper": 'toggleIndexNav'
     },
 
     langTemplates: {
@@ -1538,6 +1618,8 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
         ddocName: this.model.id,
         database: this.database
       }));
+
+      this.eventer = _.extend({}, Backbone.Events);
       
       this.advancedOptions = this.insertView('#query', new Views.AdvancedOptions({
         updateViewFn: this.updateView,
@@ -1545,13 +1627,20 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
         database: this.database,
         viewName: this.viewName,
         ddocName: this.model.id,
-        hasReduce: this.hasReduce()
+        hasReduce: this.hasReduce(),
+        eventer: this.eventer
+      }));
+
+      this.advancedOptionsMenu = this.insertView('#query-options-wrapper', new Views.AdvancedOptionsMenu({
+        hasReduce: this.hasReduce(),
+        eventer:  this.eventer
       }));
     },
 
     afterRender: function() {
       if (this.params) {
         this.advancedOptions.updateFromParams(this.params);
+        this.advancedOptionsMenu.updateFromParams(this.params);
       }
 
       this.designDocSelector.updateDesignDoc();
