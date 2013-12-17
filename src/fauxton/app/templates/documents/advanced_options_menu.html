@@ -1,14 +1,13 @@
-<div class="controls-group">
-  <div class="row-fluid">
+  <div class="row-fluid custom-inputs">
     <div class="controls controls-row">
       <div class="checkbox inline">  
         <input id="include-docs" type="checkbox" name="include_docs" value="true">  
-        <label name="include_docs" for="check1">Include Docs</label>  
+        <label for="include_docs">Include Docs</label>  
       </div> 
       <% if (hasReduce) { %>
       <div class="checkbox inline">  
         <input id="reduce" name="reduce" type="checkbox" value="true">
-        <label for="check2">Reduce</label>  
+        <label for="reduce">Reduce</label>  
         <label id="group-level-label" style="display:none" class="drop-down inline">
           Group Level:
           <select id="group-level"  name="group_level" class="input-small">
@@ -30,5 +29,5 @@
       <a data-bypass="true" id="query-nav" class="" href="#query" data-toggle="tab">More query options</a></li>
     </div> 
   </div> 
-</div> 
+ 
 

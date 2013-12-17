@@ -971,6 +971,8 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
 
   Views.AdvancedOptionsMenu = FauxtonAPI.View.extend({
     template: 'templates/documents/advanced_options_menu',
+    tagName: "div",
+    className: "controls-group advanced-options-menu",
     events: {
       "click input": "updateRows",
       'change #group-level': 'updateRows',
