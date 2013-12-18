@@ -587,15 +587,10 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
     },
 
     serialize: function() {
-      var requestDuration = false;
-
-      if (this.collection.requestDurationInString) {
-        requestDuration = this.collection.requestDurationInString();
-      }
 
       return {
         viewList: this.viewList,
-        requestDuration: requestDuration,
+        requestDuration: false,
         expandDocs: this.expandDocs
       };
     },
@@ -989,7 +984,6 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
     },
 
     updateRows: function (event) {
-      console.log('boom', event);
       var $groupLevel = this.$('#group-level-label'),
           params = {
             include_docs: false,
@@ -1008,8 +1002,6 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
       } else {
         $groupLevel.hide();
       }
-
-      console.log(params);
       this.eventer.trigger('options:param_update', params);
     },
 
@@ -1017,7 +1009,8 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
       if (params.reduce) {
         var $reduce = this.$('#reduce');
         $reduce.prop("checked", true);
-        this.$('#group-level').show();
+        this.$('#group-level-label').show();
+        this.$('option[value="' + params.group_level + '"]').prop('selected', true);
 
       } else if (params.include_docs) {
         var $include_docs = this.$('#include-docs');
@@ -1057,9 +1050,7 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
         this.showPreview = options.showPreview;
       }
 
-      if (this.eventer) { 
-        this.listenTo(this.eventer, 'options:param_update', this.optionsParamsUpdate);
-      }
+      this.eventer && this.listenTo(this.eventer, 'options:param_update', this.optionsParamsUpdate);
     },
 
     events: {
@@ -1082,12 +1073,15 @@ function(app, FauxtonAPI, Components, Documents, Databases, pouchdb, resizeColum
     optionsParamsUpdate: function (params) {
        var $form = this.$el.find("form.view-query-update");
 
+       if (!params.group_level) {
+        this.$("select[name='group_level']").attr('disabled', 'disabled');
+       }
+
        if (params.reduce && params.group_level) {
         $form.find("select[name='group_level']").val(params.group_level).removeAttr('disabled');
         delete params.group_level;
-       } else {
-        $form.find("select[name='group_level']").attr('disabled');
-       }
+       } 
+
       _.each(params, function(val, key) {
         $form.find("input[name='"+key+"']").prop('checked', val);
       });

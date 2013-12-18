@@ -443,7 +443,15 @@ function(app, FauxtonAPI) {
     },
 
     totalRows: function() {
-      return this.viewMeta.total_rows || "unknown";
+      var total = "unknown";
+
+      if (this.viewMeta.total_rows) {
+        total = this.viewMeta.total_rows;
+      } else if (this.length > 0) {
+        total = this.length;
+      }
+
+      return total;
     },
 
     updateSeq: function() {

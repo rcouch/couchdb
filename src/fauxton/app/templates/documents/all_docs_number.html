@@ -13,9 +13,12 @@ the License.
 -->
 <% if (totalRows === "unknown"){ %>
   Showing 0 documents. <a href="#/database/<%=database%>/new"> Create your first document.</a>
-<% } else { %>
-  Showing <%=offset%> - <%= numModels %> of <%= totalRows %> rows
-<%}%>
+<% } else if (offset && numModels) { %>
+<!--Showing <%=offset%> - <%= numModels %> of -->
+<%= totalRows %> rows
+<%} else {%>
+  Showing <%= totalRows %> rows
+<% } %>
 <% if (updateSeq) { %>
   -- Update Sequence: <%= updateSeq %>
 <% } %>
