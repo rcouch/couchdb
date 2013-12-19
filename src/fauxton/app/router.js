@@ -89,7 +89,7 @@ function(req, app, Initialize, FauxtonAPI, Fauxton, Layout, Databases, Documents
           authPromise.then(function () {
             if (!that.activeRouteObject || !that.activeRouteObject.hasRoute(route)) {
               if (that.activeRouteObject) {
-                that.activeRouteObject.removeViews();
+                that.activeRouteObject.cleanup();
               }
               that.activeRouteObject = new RouteObject(route, masterLayout, args);
             }
@@ -121,21 +121,6 @@ function(req, app, Initialize, FauxtonAPI, Fauxton, Layout, Databases, Documents
         }
       }, this);
     },
-
-    /*setAddonHooks: function() {
-      _.each(LoadAddons.addons, function(module) {
-        // This is updates to views by the addon
-        if (module && module.hooks){
-          _.each(module.hooks, function(callback, route){
-            if (this.masterLayout.hooks[route]) {
-              this.masterLayout.hooks[route].push(callback);
-            } else {
-              this.masterLayout.hooks[route] = [callback];
-            }
-          }, this);
-        }
-      }, this);
-    },*/
 
     initialize: function() {
       //TODO: It would be nice to handle this with a router
