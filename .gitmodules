@@ -1,0 +1,6 @@
+[submodule "src/support/spidermonkey/mozjs"]
+	path = src/support/spidermonkey/mozjs
+	url = git://github.com/refuge/mozjs.git
+[submodule "src/support/icu/icu"]
+	path = src/support/icu/icu
+	url = git://github.com/refuge/icu42.git
