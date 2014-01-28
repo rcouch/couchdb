@@ -14,27 +14,21 @@ the License.
 
 <div class="view show">
   <% if (!viewList) { %>
-    <div class="row">
-      <div class="btn-toolbar span6">
-        <button type="button" class="btn all" data-toggle="button">✓ All</button>
-        <button class="btn btn-small disabled bulk-delete"><i class="icon-trash"></i></button>
-        <% if (expandDocs) { %>
-        <button id="collapse" class="btn"><i class="icon-minus"></i> Collapse</button>
-        <% } else { %>
-        <button id="collapse" class="btn"><i class="icon-plus"></i> Expand</button>
-        <% } %>
-      </div>
+  <div class="row">
+    <div class="btn-toolbar span6">
+      <button type="button" class="btn all" data-toggle="button">✓ All</button>
+      <button class="btn btn-small disabled bulk-delete"><i class="icon-trash"></i></button>
+      <% if (expandDocs) { %>
+      <button id="collapse" class="btn"><i class="icon-minus"></i> Collapse</button>
+      <% } else { %>
+      <button id="collapse" class="btn"><i class="icon-plus"></i> Expand</button>
+      <% } %>
     </div>
+  </div>
   <% } %>
   <p>
 
   <div id="item-numbers"> </div>
-
-  <% if (requestDuration) { %>
-    <span class="view-request-duration">
-    View request duration: <strong> <%= requestDuration %> </strong> 
-    </span>
-  <% } %>
   </p>
   <table class="all-docs table table-striped table-condensed">
     <tbody></tbody>
